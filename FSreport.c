@@ -10,7 +10,9 @@ int directoryLevelCount(char *path, char *extension, int count) {
 }
 
 int max(int a, int b) {
-  return 0;
+  if (a >= b)
+  	return a;
+  return b;
 }
 
 void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName) {
