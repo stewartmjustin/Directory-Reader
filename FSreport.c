@@ -2,7 +2,9 @@
 
 int main(int argc, char const *argv[]) {
   char path[256];
-  int numLevels;
+  int numLevels, i;
+  struct levelTreeFiles *treeArray;
+  struct levelInodeFiles *inodeArray;
 
   if (argc != 3) {
   	printf("Incorrect number of command line arguments: %d\n", argc);
@@ -18,6 +20,18 @@ int main(int argc, char const *argv[]) {
 
   numLevels = directoryLevelCount(path, NULL, 0);
   printf("levels: %d\n", numLevels);
+
+  if (strcmp("-tree", argv[1]) == 0) {
+  	treeArray = malloc(sizeof(struct levelTreeFiles) * numLevels);
+
+  	for (i = 0; i < numLevels; i++) {
+  	  treeArray[i].level = i + 1;
+  	  treeArray[i].currentPosition = 0;
+  	}
+
+  	free(treeArray);
+  }
+
   return 0;
 }
 
@@ -77,7 +91,11 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
 }
 
 int strcmpFunc(const void *a, const void *b) {
-  return 0;
+  char *A, *B;
+  A = (char *)a;
+  B = (char *)b;
+
+  return strcmp(A, B);
 }
 
 int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray) {
