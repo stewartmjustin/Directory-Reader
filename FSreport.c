@@ -9,9 +9,15 @@ int main(int argc, char const *argv[]) {
   	return 0;
   }
 
+  if (strcmp("-inode", argv[1]) != 0 && strcmp("-tree", argv[1]) != 0) {
+  	printf("Incorect output type: %s\n", argv[1]);
+  	return 0;
+  }
+
   strcpy(path, argv[2]);
 
   numLevels = directoryLevelCount(path, NULL, 0);
+  printf("levels: %d\n", numLevels);
   return 0;
 }
 
@@ -51,6 +57,8 @@ int directoryLevelCount(char *path, char *extension, int count) {
   	  return -1;
   }
 
+  closedir(dir);
+
   return max(newCount, count);
 }
 
@@ -64,6 +72,7 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
 }
 
 int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray) {
+  
   return 0;
 }
 
