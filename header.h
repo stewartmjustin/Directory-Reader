@@ -15,15 +15,15 @@
 #define DIRTYPE 4
 
 struct treeFileInfo {
-  char userPWD[255];
-  char groupPWD[255];
+  char userPWD[256];
+  char groupPWD[256];
   int inodeNum;
-  char permissions[255];
+  char permissions[256];
   int biteSize;
-  char name[255];
-  char lastAccessDate[255];
-  char lastModDate[255];
-  char directory[255];
+  char name[256];
+  char lastAccessDate[256];
+  char lastModDate[256];
+  char directory[256];
   int type;
   int empty;
 };
@@ -31,31 +31,31 @@ struct treeFileInfo {
 struct levelTreeFiles {
   int level;
   int currentPosition;
-  struct treeFileInfo fileArray[255];
+  struct treeFileInfo fileArray[256];
 };
 
 struct inodeFileInfo {
   int inodeNum;
   int size;
   int blocksAlloced;
-  int sizeDiv; /*HOW DO I DO THIS*/
-  char name[255];
-  char directory[255];
+  int sizeDiv; 
+  char name[256];
+  char directory[256];
   int empty;
 };
 
 struct levelInodeFiles {
   int level;
   int currentPosition;
-  struct inodeFileInfo fileArray[255];
+  struct inodeFileInfo fileArray[256];
 };
 
-int directoryLevelCount(char *path, char *extension, int count);
-int max(int a, int b);
-void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName);
-int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray);
-int strcmpFunc(const void *a, const void *b);
-int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray);
-void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName);
-int numCmpFunc(const void *a, const void *b);
-int inodeDirSort(const void *a, const void *b);
+int directoryLevelCount(char *path, char *extension, int count); /*get number of levels in the directory*/
+int max(int a, int b); /*find the max of 2 numbers*/
+void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName); /*fill the struct for the file tree*/
+int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray); /*travel through the directory so you can access tree file info*/
+int strcmpFunc(const void *a, const void *b); /*qsort for a array of strings*/
+int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray); /*travel through the inode directorys*/
+void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName); /*fill the struct for inode*/
+int numCmpFunc(const void *a, const void *b); /*qsort for somthing*/
+int inodeDirSort(const void *a, const void *b); /*qsort for somthing*/
