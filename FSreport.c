@@ -83,6 +83,7 @@ int max(int a, int b) {
 }
 
 void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName) {
+  
 }
 
 int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray) {
@@ -127,15 +128,15 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   qsort(files, numFiles, sizeof(struct dirent), strcmpFunc);
 
   for (i = 0; i < numDir; i++) {
-  	/**/
+  	treeFileInfo(directories[i], newPath, level - 1, levelsArray, 0, extension);
   }
 
   for (i = 0; i < numFiles; i++) {
-  	/**/
+  	treeFileInfo(files[i], newPath, level - 1, levelsArray, 1, extension);
   }
 
   for (i = 0; i < numDir; i++) {
-  	/**/
+  	treeDirectoryTravel(newPath, directories[i].d_name, level, levelsArray);
   }
 
   closedir(dir);
