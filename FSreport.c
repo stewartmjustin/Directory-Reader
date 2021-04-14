@@ -89,8 +89,10 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   DIR *dir;
   struct dirent *dp;
   char newPath[256];
-  struct dirent files[256], directories[256]
+  struct dirent files[256], directories[256];
   int i, numDir = 0, numFiles = 0;
+
+  level++;
 
   strcpy(newPath, path);
   if (extension != NULL) {
@@ -98,35 +100,56 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   	strcat(newPath, extension);
   }
 
+  dir = opendir(newPath);
+  if (dir == NULL) {
+  	printf("opendir failed\n");
+  	return -1;
+  }
+
   dp = readdir(dir);
   while (dp != NULL) {
   	if (dp->d_type == DIRTYPE && strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0 && numDir < 256) {
-  	  directories[numDir]->d_ino = dp->d_ino;
-  	  directories[numDir]->d_type = dp->d_type;
-  	  strcpy(directories[numDir]->d_name, dp->d_name);
+  	  directories[numDir].d_ino = dp->d_ino;
+  	  directories[numDir].d_type = dp->d_type;
+  	  strcpy(directories[numDir].d_name, dp->d_name);
   	  numDir++;
   	}
   	else if (dp->d_type == FILETYPE && numFiles < 256) {
-  	  files[numFiles]->d_ino = dp->d_ino;
-  	  files[numFiles]->d_type = dp->d_type;
-  	  strcpy(files[numFiles]->d_name, dp->d_name);
+  	  files[numFiles].d_ino = dp->d_ino;
+  	  files[numFiles].d_type = dp->d_type;
+  	  strcpy(files[numFiles].d_name, dp->d_name);
   	  numFiles++;
   	}
+  	dp = readdir(dir);
   }
 
-  level++;
+  qsort(directories, numDir, sizeof(struct dirent), strcmpFunc);
+  qsort(files, numFiles, sizeof(struct dirent), strcmpFunc);
+
+  for (i = 0; i < numDir; i++) {
+  	/**/
+  }
+
+  for (i = 0; i < numFiles; i++) {
+  	/**/
+  }
+
+  for (i = 0; i < numDir; i++) {
+  	/**/
+  }
+
+  closedir(dir);
+
   return 0;
 }
 
 int strcmpFunc(const void *a, const void *b) {
-  struct direct *A, *B;
+  struct dirent *A, *B;
 
-  A = (struct direct *)a;
-  B = (struct direct *)b;
+  A = (struct dirent *)a;
+  B = (struct dirent *)b;
 
-  strcmp()
-
-  return strcmp(A, B);
+  return strcmp(A->d_name, B->d_name);
 }
 
 int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray) {
