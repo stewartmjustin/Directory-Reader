@@ -19,7 +19,6 @@ int main(int argc, char const *argv[]) {
   strcpy(path, argv[2]);
 
   numLevels = directoryLevelCount(path, NULL, 0);
-  printf("levels: %d\n", numLevels);
 
   if (strcmp("-tree", argv[1]) == 0) {
   	treeArray = malloc(sizeof(struct levelTreeFiles) * numLevels);
@@ -27,14 +26,40 @@ int main(int argc, char const *argv[]) {
   	for (i = 0; i < numLevels; i++) {
   	  treeArray[i].level = i + 1;
   	  treeArray[i].currentPosition = 0;
+    }
+
+  	if (treeDirectoryTravel(path, NULL, 0, treeArray) == -1) {
+  	  return 0;
   	}
 
-  	treeDirectoryTravel(path, NULL, 0, treeArray);
+  	treePrint(treeArray, numLevels);
 
   	free(treeArray);
   }
 
   return 0;
+}
+
+void treePrint(struct levelTreeFiles *levelsArray, int levelCount) {
+  int i = 0, j = 0;
+
+  for (i = 0; i < levelCount; i++) {
+  	for (j = 0; j < levelsArray[i].currentPosition; j++) {
+  	  if (j == 0 || strcmp(levelsArray[i].fileArray[j - 1].directory, levelsArray[i].fileArray[j].directory) != 0) {
+  	  	printf("Level %d: %s\n", i + 1, levelsArray[i].fileArray[j].directory);
+  	  }
+  	  if (j == 0 || levelsArray[i].fileArray[j - 1].type != levelsArray[i].fileArray[j].type) {
+  	  	if (levelsArray[i].fileArray[j].type == 0) {
+  	  	  printf("Directories\n");
+  	  	}
+  	  	else {
+  	  	  printf("\nFiles\n");
+  	  	}
+  	  }
+  	  printf("%s (%s)\t%d\t%s\t%d\t%s\n", levelsArray[i].fileArray[j].userPWD, levelsArray[i].fileArray[j].groupPWD, levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].permissions, levelsArray[i].fileArray[j].biteSize, levelsArray[i].fileArray[j].name);
+  	  printf("\t%s\t%s\n", levelsArray[i].fileArray[j].lastAccessDate, levelsArray[i].fileArray[j].lastModDate);
+  	}
+  }
 }
 
 int directoryLevelCount(char *path, char *extension, int count) {
@@ -88,7 +113,7 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   struct stat sb;
   struct passwd *pwd;
   struct group *grp;
-  char newName[256], aTime[256], mTime[256], permission[256];
+  char newName[256], aTime[256], mTime[256], permission[256], dName[256];
 
   strcpy(newName, path);
   strcat(newName, "/");
@@ -98,6 +123,11 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   	printf("stat Failed\n");
   	return;
   }
+
+  if (dirName == NULL)
+  	strcpy(dName, path);
+  else
+  	strcpy(dName, dirName);
 
   pwd = getpwuid(sb.st_uid);
   grp = getgrgid(sb.st_gid);
@@ -116,72 +146,64 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   else
   	strcpy(permission, "-");
 
-  if (sb.st_mode && S_IRUSR)
+  if (sb.st_mode & S_IRUSR)
   	strcat(permission, "r");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IWUSR)
+  if (sb.st_mode & S_IWUSR)
   	strcat(permission, "w");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IXUSR)
+  if (sb.st_mode & S_IXUSR)
   	strcat(permission, "x");
   else
   	strcat(permission, "-");
 
-  /*if (sb.st_mode && S_IRGRP)
+  if (sb.st_mode & S_IRGRP)
   	strcat(permission, "r");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IWGRP)
+  if (sb.st_mode & S_IWGRP)
   	strcat(permission, "w");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IXGRP)
+  if (sb.st_mode & S_IXGRP)
   	strcat(permission, "x");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IROTH)
+  if (sb.st_mode & S_IROTH)
   	strcat(permission, "r");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IWOTH)
+  if (sb.st_mode & S_IWOTH)
   	strcat(permission, "w");
   else
   	strcat(permission, "-");
 
-  if (sb.st_mode && S_IXOTH)
+  if (sb.st_mode & S_IXOTH)
   	strcat(permission, "x");
   else
-  	strcat(permission, "-");*/
+  	strcat(permission, "-");
 
   strcat(permission, "\0");
 
-  printf("%s\n", permission);
-
-  /*printf("File Permissions: \t");
-    printf( (S_ISDIR(sb.st_mode)) ? "d" : "-");
-    printf( (sb.st_mode & S_IRUSR) ? "r" : "-");
-    printf( (sb.st_mode & S_IWUSR) ? "w" : "-");
-    printf( (sb.st_mode & S_IXUSR) ? "x" : "-");
-    printf( (sb.st_mode & S_IRGRP) ? "r" : "-");
-    printf( (sb.st_mode & S_IWGRP) ? "w" : "-");
-    printf( (sb.st_mode & S_IXGRP) ? "x" : "-");
-    printf( (sb.st_mode & S_IROTH) ? "r" : "-");
-    printf( (sb.st_mode & S_IWOTH) ? "w" : "-");
-    printf( (sb.st_mode & S_IXOTH) ? "x" : "-");
-    printf("\n\n");*/
-
-  /*printf("%s(%s) %ld %s %ld %s\n", pwd->pw_name, grp->gr_name, dirp.d_ino, permission, sb.st_size, dirp.d_name);
-  printf("%s %s\n", aTime, mTime);*/
-
-  /*levelsArray[level].fileArray[levelsArray.currentPosition]*/
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].userPWD, pwd->pw_name);
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].groupPWD, grp->gr_name);
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].inodeNum = dirp.d_ino;
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].permissions, permission);
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].biteSize = sb.st_size;
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].name, dirp.d_name);
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].lastAccessDate, aTime);
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].lastModDate, mTime);
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].directory, dName);
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].type = fileOrDir;
+  levelsArray[level].currentPosition++;
 }
 
 int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray) {
