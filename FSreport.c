@@ -46,18 +46,22 @@ void treePrint(struct levelTreeFiles *levelsArray, int levelCount) {
   for (i = 0; i < levelCount; i++) {
   	for (j = 0; j < levelsArray[i].currentPosition; j++) {
   	  if (j == 0 || strcmp(levelsArray[i].fileArray[j - 1].directory, levelsArray[i].fileArray[j].directory) != 0) {
-  	  	printf("Level %d: %s\n", i + 1, levelsArray[i].fileArray[j].directory);
+  	  	printf("\nLevel %d: %s\n", i + 1, levelsArray[i].fileArray[j].directory);
   	  }
   	  if (j == 0 || levelsArray[i].fileArray[j - 1].type != levelsArray[i].fileArray[j].type) {
   	  	if (levelsArray[i].fileArray[j].type == 0) {
   	  	  printf("Directories\n");
   	  	}
+  	  	else if (levelsArray[i].fileArray[j].type == -1) {
+  	  	}
   	  	else {
   	  	  printf("\nFiles\n");
   	  	}
   	  }
-  	  printf("%s (%s)\t%d\t%s\t%d\t%s\n", levelsArray[i].fileArray[j].userPWD, levelsArray[i].fileArray[j].groupPWD, levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].permissions, levelsArray[i].fileArray[j].biteSize, levelsArray[i].fileArray[j].name);
-  	  printf("\t%s\t%s\n", levelsArray[i].fileArray[j].lastAccessDate, levelsArray[i].fileArray[j].lastModDate);
+  	  if (levelsArray[i].fileArray[j].empty != 1) {
+  	  	printf("%s (%s)\t%d\t%s\t%d\t%s\n", levelsArray[i].fileArray[j].userPWD, levelsArray[i].fileArray[j].groupPWD, levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].permissions, levelsArray[i].fileArray[j].biteSize, levelsArray[i].fileArray[j].name);
+  	    printf("\t%s\t%s\n", levelsArray[i].fileArray[j].lastAccessDate, levelsArray[i].fileArray[j].lastModDate);
+  	  }
   	}
   }
 }
@@ -246,6 +250,21 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
 
   qsort(directories, numDir, sizeof(struct dirent), strcmpFunc);
   qsort(files, numFiles, sizeof(struct dirent), strcmpFunc);
+
+  if (numDir == 0 && numFiles == 0) {
+  	levelsArray[level - 1].fileArray[0].empty = 1;
+  	if (extension != NULL) {
+  	  strcpy(levelsArray[level - 1].fileArray[0].directory, extension);
+  	}
+  	else {
+  	  strcpy(levelsArray[level - 1].fileArray[0].directory, path);
+  	}
+  	levelsArray[level - 1].fileArray[0].type = -1;
+  	levelsArray[level - 1].currentPosition++;
+  }
+  else {
+  	levelsArray[level - 1].fileArray[0].empty = 0;
+  }
 
   for (i = 0; i < numDir; i++) {
   	treeFileInfo(directories[i], newPath, level - 1, levelsArray, 0, extension);
