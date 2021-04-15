@@ -88,7 +88,7 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   struct stat sb;
   struct passwd *pwd;
   struct group *grp;
-  char newName[256], aTime[256], mTime[256];
+  char newName[256], aTime[256], mTime[256], permission[256];
 
   strcpy(newName, path);
   strcat(newName, "/");
@@ -111,8 +111,75 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   aTime[strlen(aTime) - 1] = '\0';
   mTime[strlen(mTime) - 1] = '\0';
 
-  printf("%s(%s) %ld permission %ld %s\n", pwd->pw_name, grp->gr_name, dirp.d_ino, sb.st_size, dirp.d_name);
-  printf("%s %s\n", aTime, mTime);
+  if (S_ISDIR(sb.st_mode))
+  	strcpy(permission, "d");
+  else
+  	strcpy(permission, "-");
+
+  if (sb.st_mode && S_IRUSR)
+  	strcat(permission, "r");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IWUSR)
+  	strcat(permission, "w");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IXUSR)
+  	strcat(permission, "x");
+  else
+  	strcat(permission, "-");
+
+  /*if (sb.st_mode && S_IRGRP)
+  	strcat(permission, "r");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IWGRP)
+  	strcat(permission, "w");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IXGRP)
+  	strcat(permission, "x");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IROTH)
+  	strcat(permission, "r");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IWOTH)
+  	strcat(permission, "w");
+  else
+  	strcat(permission, "-");
+
+  if (sb.st_mode && S_IXOTH)
+  	strcat(permission, "x");
+  else
+  	strcat(permission, "-");*/
+
+  strcat(permission, "\0");
+
+  printf("%s\n", permission);
+
+  /*printf("File Permissions: \t");
+    printf( (S_ISDIR(sb.st_mode)) ? "d" : "-");
+    printf( (sb.st_mode & S_IRUSR) ? "r" : "-");
+    printf( (sb.st_mode & S_IWUSR) ? "w" : "-");
+    printf( (sb.st_mode & S_IXUSR) ? "x" : "-");
+    printf( (sb.st_mode & S_IRGRP) ? "r" : "-");
+    printf( (sb.st_mode & S_IWGRP) ? "w" : "-");
+    printf( (sb.st_mode & S_IXGRP) ? "x" : "-");
+    printf( (sb.st_mode & S_IROTH) ? "r" : "-");
+    printf( (sb.st_mode & S_IWOTH) ? "w" : "-");
+    printf( (sb.st_mode & S_IXOTH) ? "x" : "-");
+    printf("\n\n");*/
+
+  /*printf("%s(%s) %ld %s %ld %s\n", pwd->pw_name, grp->gr_name, dirp.d_ino, permission, sb.st_size, dirp.d_name);
+  printf("%s %s\n", aTime, mTime);*/
 
   /*levelsArray[level].fileArray[levelsArray.currentPosition]*/
 }
