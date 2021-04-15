@@ -29,6 +29,8 @@ int main(int argc, char const *argv[]) {
   	  treeArray[i].currentPosition = 0;
   	}
 
+  	treeDirectoryTravel(path, NULL, 0, treeArray);
+
   	free(treeArray);
   }
 
@@ -83,7 +85,36 @@ int max(int a, int b) {
 }
 
 void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName) {
-  
+  struct stat sb;
+  struct passwd *pwd;
+  struct group *grp;
+  char newName[256], aTime[256], mTime[256];
+
+  strcpy(newName, path);
+  strcat(newName, "/");
+  strcat(newName, dirp.d_name);
+
+  if (stat(newName, &sb) == -1) {
+  	printf("stat Failed\n");
+  	return;
+  }
+
+  pwd = getpwuid(sb.st_uid);
+  grp = getgrgid(sb.st_gid);
+  strcpy(aTime, ctime(&sb.st_atime));
+
+  if (sb.st_mtime >= sb.st_ctime)
+  	strcpy(mTime, ctime(&sb.st_mtime));
+  else
+  	strcpy(mTime, ctime(&sb.st_ctime));
+
+  aTime[strlen(aTime) - 1] = '\0';
+  mTime[strlen(mTime) - 1] = '\0';
+
+  printf("%s(%s) %ld permission %ld %s\n", pwd->pw_name, grp->gr_name, dirp.d_ino, sb.st_size, dirp.d_name);
+  printf("%s %s\n", aTime, mTime);
+
+  /*levelsArray[level].fileArray[levelsArray.currentPosition]*/
 }
 
 int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray) {
