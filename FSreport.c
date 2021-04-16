@@ -68,7 +68,9 @@ void inodePrint(struct levelInodeFiles *levelsArray, int levelCount) {
   	  if (j == 0 || strcmp(levelsArray[i].fileArray[j].directory, levelsArray[i].fileArray[j - 1].directory) != 0) {
   	  	printf("Level %d: %s\n", i + 1, levelsArray[i].fileArray[j].directory);
   	  }
-  	  printf("%d:\t%d\t%d\t%d\t%s\n", levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].size, levelsArray[i].fileArray[j].blocksAlloced, levelsArray[i].fileArray[j].sizeDiv, levelsArray[i].fileArray[j].name);
+  	  if (levelsArray[i].fileArray[j].empty == 0) {
+  	  	printf("%d:\t%d\t%d\t%d\t%s\n", levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].size, levelsArray[i].fileArray[j].blocksAlloced, levelsArray[i].fileArray[j].sizeDiv, levelsArray[i].fileArray[j].name);
+  	  }
   	}
   }
 }
@@ -365,6 +367,14 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
 
   qsort(directories, numDir, sizeof(struct dirent), numCmpFunc);
   qsort(files, numFiles, sizeof(struct dirent), numCmpFunc);
+
+  if (numDir == 0 && numFiles == 0) {
+  	levelsArray[level - 1].fileArray[levelsArray[level - 1].currentPosition].empty = 1;
+  	levelsArray[level - 1].currentPosition++;
+  }
+  else {
+  	levelsArray[level - 1].fileArray[levelsArray[level - 1].currentPosition].empty = 0;
+  }
 
   for (i = 0; i < numDir; i++) {
   	inodeFileInfo(directories[i], newPath, level - 1, levelsArray, extension);
