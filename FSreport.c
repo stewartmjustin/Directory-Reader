@@ -48,6 +48,10 @@ int main(int argc, char const *argv[]) {
   	  return 0;
   	}
 
+  	for (i = 0; i < numLevels; i++) {
+  	  qsort(inodeArray[i].fileArray, inodeArray[i].currentPosition, sizeof(struct inodeFileInfo), inodeDirSort);
+  	}
+
   	inodePrint(inodeArray, numLevels);
 
   	free(inodeArray);
@@ -61,6 +65,9 @@ void inodePrint(struct levelInodeFiles *levelsArray, int levelCount) {
 
   for (i = 0; i < levelCount; i++) {
   	for (j = 0; j < levelsArray[i].currentPosition; j++) {
+  	  if (j == 0 || strcmp(levelsArray[i].fileArray[j].directory, levelsArray[i].fileArray[j - 1].directory) != 0) {
+  	  	printf("Level %d: %s\n", i + 1, levelsArray[i].fileArray[j].directory);
+  	  }
   	  printf("%d:\t%d\t%d\t%d\t%s\n", levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].size, levelsArray[i].fileArray[j].blocksAlloced, levelsArray[i].fileArray[j].sizeDiv, levelsArray[i].fileArray[j].name);
   	}
   }
@@ -323,7 +330,7 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
   struct dirent *dp;
   char newPath[256];
   struct dirent files[125], directories[125];
-  int i, numDir = 0, numFiles = 0, j;
+  int i, numDir = 0, numFiles = 0;
 
   level++;
 
@@ -356,6 +363,9 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
   	dp = readdir(dir);
   }
 
+  qsort(directories, numDir, sizeof(struct dirent), numCmpFunc);
+  qsort(files, numFiles, sizeof(struct dirent), numCmpFunc);
+
   for (i = 0; i < numDir; i++) {
   	inodeFileInfo(directories[i], newPath, level - 1, levelsArray, extension);
   }
@@ -363,17 +373,6 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
   for (i = 0; i < numFiles; i++) {
   	inodeFileInfo(files[i], newPath, level - 1, levelsArray, extension);
   }
-
-  /*printf("1\n2\n");
-
-  for (i = 0; i < level; i++) {
-  	printf("level: %d, curP: %d\n", level, levelsArray[i].currentPosition);
-  	for (j = 0; j < levelsArray[i].currentPosition; j++) {
-  	  printf("%d, %d:%s\n", i, j, levelsArray[i].fileArray[j].name);
-  	}
-  }
-
-  printf("4\n5\n");*/
 
   for (i = 0; i < numDir; i++) {
   	inodeDirectoryTravel(newPath, directories[i].d_name, level, levelsArray);
@@ -422,15 +421,25 @@ void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeF
   strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].name, name);
   strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].directory, direct);
 
-  /*printf("[%d][%d] %d:\t%d\t%d\t%d\t%s\n", level, levelsArray[level].currentPosition, levelsArray[level].fileArray[levelsArray[level].currentPosition].inodeNum, levelsArray[level].fileArray[levelsArray[level].currentPosition].size, levelsArray[level].fileArray[levelsArray[level].currentPosition].blocksAlloced, levelsArray[level].fileArray[levelsArray[level].currentPosition].sizeDiv, levelsArray[level].fileArray[levelsArray[level].currentPosition].name);*/
-
   levelsArray[level].currentPosition++;
 }
 
 int numCmpFunc(const void *a, const void *b) {
-  return 0;
+  struct dirent *A, *B;
+
+  A = (struct dirent*)a;
+  B = (struct dirent*)b;
+
+  return A->d_ino - B->d_ino;
 }
 
 int inodeDirSort(const void *a, const void *b) {
+  struct inodeFileInfo *A, *B;
+
+  A = (struct inodeFileInfo *)a;
+  B = (struct inodeFileInfo *)b;
+
+  if (strcmp(A->directory, B->directory) == 0)
+  	return A->inodeNum - B->inodeNum;
   return 0;
 }
