@@ -36,8 +36,34 @@ int main(int argc, char const *argv[]) {
 
   	free(treeArray);
   }
+  else {
+  	inodeArray = malloc(sizeof(struct levelInodeFiles) * numLevels);
+
+  	for (i = 0; i < numLevels; i++) {
+  	  inodeArray[i].level = i + 1;
+  	  inodeArray[i].currentPosition = 0;
+  	}
+
+  	if (inodeDirectoryTravel(path, NULL, 0, inodeArray) == -1) {
+  	  return 0;
+  	}
+
+  	inodePrint(inodeArray, numLevels);
+
+  	free(inodeArray);
+  }
 
   return 0;
+}
+
+void inodePrint(struct levelInodeFiles *levelsArray, int levelCount) {
+  int i = 0, j = 0;
+
+  for (i = 0; i < levelCount; i++) {
+  	for (j = 0; j < levelsArray[i].currentPosition; j++) {
+  	  printf("%d:\t%d\t%d\t%d\t%s\n", levelsArray[i].fileArray[j].inodeNum, levelsArray[i].fileArray[j].size, levelsArray[i].fileArray[j].blocksAlloced, levelsArray[i].fileArray[j].sizeDiv, levelsArray[i].fileArray[j].name);
+  	}
+  }
 }
 
 void treePrint(struct levelTreeFiles *levelsArray, int levelCount) {
@@ -293,11 +319,112 @@ int strcmpFunc(const void *a, const void *b) {
 }
 
 int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray) {
+  DIR *dir;
+  struct dirent *dp;
+  char newPath[256];
+  struct dirent files[125], directories[125];
+  int i, numDir = 0, numFiles = 0, j;
+
+  level++;
+
+  strcpy(newPath, path);
+  if (extension != NULL) {
+  	strcat(newPath, "/");
+  	strcat(newPath, extension);
+  }
+
+  dir = opendir(newPath);
+  if (dir == NULL) {
+  	printf("opendir failed\n");
+  	return -1;
+  }
+
+  dp = readdir(dir);
+  while (dp != NULL) {
+  	if (dp->d_type == DIRTYPE && strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0 && numDir < 256) {
+  	  directories[numDir].d_ino = dp->d_ino;
+  	  directories[numDir].d_type = dp->d_type;
+  	  strcpy(directories[numDir].d_name, dp->d_name);
+  	  numDir++;
+  	}
+  	else if (dp->d_type == FILETYPE && numFiles < 256) {
+  	  files[numFiles].d_ino = dp->d_ino;
+  	  files[numFiles].d_type = dp->d_type;
+  	  strcpy(files[numFiles].d_name, dp->d_name);
+  	  numFiles++;
+  	}
+  	dp = readdir(dir);
+  }
+
+  for (i = 0; i < numDir; i++) {
+  	inodeFileInfo(directories[i], newPath, level - 1, levelsArray, extension);
+  }
+
+  for (i = 0; i < numFiles; i++) {
+  	inodeFileInfo(files[i], newPath, level - 1, levelsArray, extension);
+  }
+
+  /*printf("1\n2\n");
+
+  for (i = 0; i < level; i++) {
+  	printf("level: %d, curP: %d\n", level, levelsArray[i].currentPosition);
+  	for (j = 0; j < levelsArray[i].currentPosition; j++) {
+  	  printf("%d, %d:%s\n", i, j, levelsArray[i].fileArray[j].name);
+  	}
+  }
+
+  printf("4\n5\n");*/
+
+  for (i = 0; i < numDir; i++) {
+  	inodeDirectoryTravel(newPath, directories[i].d_name, level, levelsArray);
+  }
+  
   return 0;
 }
 
 void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName) {
-  
+  int inoNum, biteSize, blocks, sizeDiv;
+  char name[256], direct[256], newName[256];
+  struct stat sb;
+
+  strcpy(newName, path);
+  strcat(newName, "/");
+  strcat(newName, dirp.d_name);
+
+  if (stat(newName, &sb) == -1) {
+  	printf("stat Failed\n");
+  	return;
+  }
+
+  if (directoryName == NULL) {
+  	strcpy(direct, path);
+  }
+  else {
+  	strcpy(direct, directoryName);
+  }
+
+  inoNum = dirp.d_ino;
+  biteSize = sb.st_size;
+  blocks = sb.st_blocks;
+  sizeDiv = ceil((float)sb.st_size/512);
+  strcpy(name, dirp.d_name);
+  if (directoryName == NULL) {
+  	strcpy(direct, path);
+  }
+  else {
+  	strcpy(direct, directoryName);
+  }
+
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].inodeNum = inoNum;
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].size = biteSize;
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].blocksAlloced = blocks;
+  levelsArray[level].fileArray[levelsArray[level].currentPosition].sizeDiv = sizeDiv;
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].name, name);
+  strcpy(levelsArray[level].fileArray[levelsArray[level].currentPosition].directory, direct);
+
+  /*printf("[%d][%d] %d:\t%d\t%d\t%d\t%s\n", level, levelsArray[level].currentPosition, levelsArray[level].fileArray[levelsArray[level].currentPosition].inodeNum, levelsArray[level].fileArray[levelsArray[level].currentPosition].size, levelsArray[level].fileArray[levelsArray[level].currentPosition].blocksAlloced, levelsArray[level].fileArray[levelsArray[level].currentPosition].sizeDiv, levelsArray[level].fileArray[levelsArray[level].currentPosition].name);*/
+
+  levelsArray[level].currentPosition++;
 }
 
 int numCmpFunc(const void *a, const void *b) {
