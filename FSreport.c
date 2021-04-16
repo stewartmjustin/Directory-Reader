@@ -249,7 +249,7 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   DIR *dir;
   struct dirent *dp;
   char newPath[256];
-  struct dirent files[256], directories[256];
+  struct dirent files[125], directories[125];
   int i, numDir = 0, numFiles = 0;
 
   level++;
@@ -267,7 +267,7 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   }
 
   dp = readdir(dir);
-  while (dp != NULL) {
+  while (dp != NULL  && numFiles < 125 && numDir < 125) {
   	if (dp->d_type == DIRTYPE && strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0 && numDir < 256) {
   	  directories[numDir].d_ino = dp->d_ino;
   	  directories[numDir].d_type = dp->d_type;
@@ -349,7 +349,7 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
   }
 
   dp = readdir(dir);
-  while (dp != NULL) {
+  while (dp != NULL && numFiles < 125 && numDir < 125) {
   	if (dp->d_type == DIRTYPE && strcmp(".", dp->d_name) != 0 && strcmp("..", dp->d_name) != 0 && numDir < 256) {
   	  directories[numDir].d_ino = dp->d_ino;
   	  directories[numDir].d_type = dp->d_type;
