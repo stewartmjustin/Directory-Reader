@@ -1,3 +1,4 @@
+/*Justin Stewart 1052722 jstewa28@uougleph.ca Assingment 4*/
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -59,3 +60,6 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
 void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName); /*fill the struct for inode*/
 int numCmpFunc(const void *a, const void *b); /*qsort for somthing*/
 int inodeDirSort(const void *a, const void *b); /*qsort for somthing*/
+
+void treePrint(struct levelTreeFiles *levelsArray, int levelCount);
+void inodePrint(struct levelInodeFiles *levelsArray, int levelCount);
