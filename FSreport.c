@@ -1,6 +1,7 @@
 /*Justin Stewart 1052722 jstewa28@uougleph.ca Assingment 4*/
 #include "header.h"
 
+/*Starting function*/
 int main(int argc, char const *argv[]) {
   char path[256];
   int numLevels, i;
@@ -61,6 +62,7 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
+/*print the final answer for an inode tree*/
 void inodePrint(struct levelInodeFiles *levelsArray, int levelCount) {
   int i = 0, j = 0;
 
@@ -76,6 +78,7 @@ void inodePrint(struct levelInodeFiles *levelsArray, int levelCount) {
   }
 }
 
+/*print the final answer for a tree tree*/
 void treePrint(struct levelTreeFiles *levelsArray, int levelCount) {
   int i = 0, j = 0;
 
@@ -102,6 +105,7 @@ void treePrint(struct levelTreeFiles *levelsArray, int levelCount) {
   }
 }
 
+/*Count the number of levels in the directory*/
 int directoryLevelCount(char *path, char *extension, int count) {
   DIR *dir;
   struct dirent *dp;
@@ -143,12 +147,14 @@ int directoryLevelCount(char *path, char *extension, int count) {
   return max(newCount, count);
 }
 
+/*return the max of 2 numbers*/
 int max(int a, int b) {
   if (a >= b)
   	return a;
   return b;
 }
 
+/*Fill a struct with info for the -tree file type*/
 void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName) {
   struct stat sb;
   struct passwd *pwd;
@@ -246,6 +252,7 @@ void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFil
   levelsArray[level].currentPosition++;
 }
 
+/*Go through the levels for -tree and call functions to collect info on files*/
 int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray) {
   DIR *dir;
   struct dirent *dp;
@@ -319,6 +326,7 @@ int treeDirectoryTravel(char *path, char *extension, int level, struct levelTree
   return 0;
 }
 
+/*compares the names of the structs to put them in order*/
 int strcmpFunc(const void *a, const void *b) {
   struct dirent *A, *B;
 
@@ -328,6 +336,7 @@ int strcmpFunc(const void *a, const void *b) {
   return strcmp(A->d_name, B->d_name);
 }
 
+/*Travel through the levels to collect info for structs for the -inode file*/
 int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray) {
   DIR *dir;
   struct dirent *dp;
@@ -392,6 +401,7 @@ int inodeDirectoryTravel(char *path, char *extension, int level, struct levelIno
   return 0;
 }
 
+/*collect file info and fill a struct for the -inode tree*/
 void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName) {
   int inoNum, biteSize, blocks, sizeDiv;
   char name[256], direct[256], newName[256];
@@ -435,6 +445,7 @@ void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeF
   levelsArray[level].currentPosition++;
 }
 
+/*sort function for inode number*/
 int numCmpFunc(const void *a, const void *b) {
   struct dirent *A, *B;
 
@@ -444,6 +455,7 @@ int numCmpFunc(const void *a, const void *b) {
   return A->d_ino - B->d_ino;
 }
 
+/*sort directory by inode number*/
 int inodeDirSort(const void *a, const void *b) {
   struct inodeFileInfo *A, *B;
 
