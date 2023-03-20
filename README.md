@@ -5,7 +5,9 @@ This program will lists files and directories inside of a directory with two dis
 ## List Files
 
 Files: makefile, header.h, FSreport.c, README.txt
+
 Created by: Justin Stewart
+
 Email: stewartm.justin@outlook.com
 
 ## Compile
