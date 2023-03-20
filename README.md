@@ -1,4 +1,8 @@
-# List Files
+# Directory Reader
+
+This program will lists files and directories inside of a directory with two display options.
+
+## List Files
 
 Files: makefile, header.h, FSreport.c, README.txt
 Created by: Justin Stewart
