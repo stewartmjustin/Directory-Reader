@@ -1,4 +1,9 @@
-/*Justin Stewart 1052722 jstewa28@uougleph.ca Assingment 4*/
+/*
+     Created by: Justin Stewart
+     Email: stewartm.justin@outlook.com
+*/
+
+/* Include Librarys */
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -12,6 +17,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Define Macros and Structs */
 #define FILETYPE 8
 #define DIRTYPE 4
 
@@ -51,15 +57,16 @@ struct levelInodeFiles {
   struct inodeFileInfo fileArray[256];
 };
 
-int directoryLevelCount(char *path, char *extension, int count); /*get number of levels in the directory*/
-int max(int a, int b); /*find the max of 2 numbers*/
+/* Define Functions */
+int directoryLevelCount(char *path, char *extension, int count);                                                                /*get number of levels in the directory*/
+int max(int a, int b);                                                                                                          /*find the max of 2 numbers*/
 void treeFileInfo(struct dirent dirp, char *path, int level, struct levelTreeFiles *levelsArray, int fileOrDir, char *dirName); /*fill the struct for the file tree*/
-int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray); /*travel through the directory so you can access tree file info*/
-int strcmpFunc(const void *a, const void *b); /*qsort for a array of strings*/
-int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray); /*travel through the inode directorys*/
-void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName); /*fill the struct for inode*/
-int numCmpFunc(const void *a, const void *b); /*qsort for somthing*/
-int inodeDirSort(const void *a, const void *b); /*qsort for somthing*/
+int treeDirectoryTravel(char *path, char *extension, int level, struct levelTreeFiles *levelsArray);                            /*travel through the directory so you can access tree file info*/
+int strcmpFunc(const void *a, const void *b);                                                                                   /*qsort for a array of strings*/
+int inodeDirectoryTravel(char *path, char *extension, int level, struct levelInodeFiles *levelsArray);                          /*travel through the inode directorys*/
+void inodeFileInfo(struct dirent dirp, char *path, int level, struct levelInodeFiles *levelsArray, char *directoryName);        /*fill the struct for inode*/
+int numCmpFunc(const void *a, const void *b);                                                                                   /*qsort for somthing*/
+int inodeDirSort(const void *a, const void *b);                                                                                 /*qsort for somthing*/
 
-void treePrint(struct levelTreeFiles *levelsArray, int levelCount);
-void inodePrint(struct levelInodeFiles *levelsArray, int levelCount);
+void treePrint(struct levelTreeFiles *levelsArray, int levelCount);                                                             /*Print output for -tree option*/
+void inodePrint(struct levelInodeFiles *levelsArray, int levelCount);                                                           /*Print output for -inode option*/

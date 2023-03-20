@@ -1,4 +1,8 @@
-/*Justin Stewart 1052722 jstewa28@uougleph.ca Assingment 4*/
+/*
+     Created by: Justin Stewart
+     Email: stewartm.justin@outlook.com
+*/
+
 #include "header.h"
 
 /*Starting function*/
@@ -9,12 +13,12 @@ int main(int argc, char const *argv[]) {
   struct levelInodeFiles *inodeArray;
 
   if (argc != 3) {
-  	printf("Incorrect number of command line arguments: %d\n", argc);
+  	printf("Incorrect number of command line arguments, 3 needed\n");
   	return 0;
   }
 
   if (strcmp("-inode", argv[1]) != 0 && strcmp("-tree", argv[1]) != 0) {
-  	printf("Incorect output type: %s\n", argv[1]);
+  	printf("Incorect output type: %s\nPlease enter \"-tree\" or \"-inode\"\n", argv[1]);
   	return 0;
   }
 

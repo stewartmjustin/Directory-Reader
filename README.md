@@ -29,3 +29,7 @@ And path is the path to the directory you want to be explored by the program.
 My program has the limitation of a max of 125 files per directory, 125 directories per directory and 256 files/directories per level.
 
 My program has worked for everything I have tested so far with the exception of some odd files, like the .git directory.
+
+## Notes
+
+I made this as part of an assignment at the Univeristy of Guelph for the course CIS\*3110.
